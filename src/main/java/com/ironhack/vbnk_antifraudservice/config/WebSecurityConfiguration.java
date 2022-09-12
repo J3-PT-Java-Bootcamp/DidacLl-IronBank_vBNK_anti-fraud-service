@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.eraseCredentials(false);
         KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);
@@ -34,9 +35,12 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
                 .disable()
                 .authorizeRequests()
                 .antMatchers("/v1/**").hasRole("developer")
-                .antMatchers( "/v1/**/client").hasRole("client")
-                .antMatchers("/v1/**/auth").hasAnyRole("admin","client")
-                .antMatchers("/v1/**/main").hasAnyRole("admin","customer")
+
+                .antMatchers("/v1/**/client/**").permitAll()
+                .antMatchers("/v1/**/public/**").permitAll()
+//                .antMatchers( "/v1/**/client").hasRole("client")
+                .antMatchers("/v1/**/auth/**").hasAnyRole("admin", "client")
+                .antMatchers("/v1/**/main/**").hasAnyRole("admin", "customer")
                 .anyRequest()
                 .authenticated()
                 .and()
