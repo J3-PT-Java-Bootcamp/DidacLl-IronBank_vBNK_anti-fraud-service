@@ -13,10 +13,11 @@ import java.time.Instant;
 @Getter @Setter
 @NoArgsConstructor
 @Entity
-public class AFTransaction {
+public class AFLog {
     @Id
-    @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column( updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
+    @GenericGenerator(name = "date_based_id_generator", strategy =
+            "com.ironhack.vbnk_antifraudservice.utils.AFLogIdGenerator")
+    @GeneratedValue(generator = "date_based_id_generator")
     private String id;
 
     private BigDecimal amount;
@@ -28,8 +29,8 @@ public class AFTransaction {
     @Column(updatable = false)
     private Instant transactionDate;
 
-    public static AFTransaction fromDTO(AFTransactionDTO dto){
-        return new AFTransaction()
+    public static AFLog fromDTO(AFTransactionDTO dto){
+        return new AFLog()
                 .setTransactionDate(dto.getTransactionDate())
                 .setAmount(dto.getAmount())
                 .setSenderId(dto.getSenderId())
