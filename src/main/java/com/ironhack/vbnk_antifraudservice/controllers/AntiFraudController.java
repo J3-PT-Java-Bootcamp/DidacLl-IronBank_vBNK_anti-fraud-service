@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface AntiFraudController{
 
 
-AFResponse validateTransaction(AFRequest request);
+    AFResponse validateTransaction(AFRequest request);
 
-
-    @GetMapping("/v1/af/service/update")
+    String ping(String ping);
     void updateService();
 }

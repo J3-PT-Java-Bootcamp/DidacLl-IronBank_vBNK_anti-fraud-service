@@ -27,6 +27,13 @@ public class AntiFraudControllerImpl implements AntiFraudController {
 
         return service.registerTransaction(request,res);
     }
+
+    @Override
+    @GetMapping("/client/test/{ping}")
+    public String ping(@PathVariable(name = "ping") String ping) {
+        return ping.replace('i','o');
+    }
+
     @Override
     @GetMapping("/v1/af/service/update")
     public void updateService(){
