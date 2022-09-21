@@ -37,7 +37,7 @@ public class AntiFraudServiceImpl implements AntiFraudService {
     @Override
     public AFResponse mainValidation(AFRequest request, String ref){
         return new AFResponse()
-                .setValidationLegalReq(validateLegalRequeriments(request))
+                .setValidationLegalReq(validateLegalRequirements(request))
                 .setValidationSpamBot(validateSpamBot(request,ref))
                 .setValidationSpamHuman(validateSpamHuman(request,ref))
                 .setValidationReiterateTrans(validateReiterateTransactions(request,ref))
@@ -51,12 +51,25 @@ public class AntiFraudServiceImpl implements AntiFraudService {
     }
 
     private int validateReiterateTransactions(AFRequest request, String ref) {
-        // TODO: 18/09/2022  
+        var list =afRepository.findAllBySrcAccountNumberOrderByTransactionDateDesc(ref);
+        if (list.isEmpty())list=afRepository.findAllBySenderIdOrderByTransactionDateDesc(ref);
+        if(list.isEmpty())return 0;
+        int val=0;
+        for (int i = 0; i < Math.min(list.size(), 3); i++) {
+            if(list.get(i).compare(request))val++;
+        }
+        if(val>=2) return 1;
         return 0;
     }
 
     private int validateSpamHuman(AFRequest request, String ref) {
-        // TODO: 18/09/2022  
+        var list =afRepository.findAllBySrcAccountNumberOrderByTransactionDateDesc(ref);
+        if (list.isEmpty())list=afRepository.findAllBySenderIdOrderByTransactionDateDesc(ref);
+        int val=0;
+        for (int i = 0; i < Math.min(list.size(), 3); i++) {
+            if(list.get(i).compareSimilarity(request)>80)val++;
+        }
+        if(val>=2)return 1;
         return 0;
     }
 
@@ -65,7 +78,7 @@ public class AntiFraudServiceImpl implements AntiFraudService {
         return 0;
     }
 
-    private int validateLegalRequeriments(AFRequest request) {
+    private int validateLegalRequirements(AFRequest request) {
         // TODO: 18/09/2022  
         return 0;
     }
