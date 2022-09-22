@@ -5,18 +5,22 @@ import com.ironhack.vbnk_antifraudservice.model.AFResponse;
 import com.ironhack.vbnk_antifraudservice.model.AFTransaction;
 import com.ironhack.vbnk_antifraudservice.repositories.AntiFraudRepository;
 import com.ironhack.vbnk_antifraudservice.utils.VBNKConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class AntiFraudServiceImpl implements AntiFraudService {
-    @Autowired
+    final
     AntiFraudRepository afRepository;
+
+    public AntiFraudServiceImpl(AntiFraudRepository afRepository) {
+        this.afRepository = afRepository;
+    }
 
     @Override
     public AFResponse registerTransaction(AFRequest request, AFResponse res) {
@@ -57,8 +61,7 @@ public class AntiFraudServiceImpl implements AntiFraudService {
     }
 
     private int validateReiterateTransactions(AFRequest request, String ref) {
-        var list = afRepository.findAllBySrcAccountNumberOrderByTransactionDateDesc(ref);
-        if (list.isEmpty()) list = afRepository.findAllBySenderIdOrderByTransactionDateDesc(ref);
+        List<AFTransaction> list = getAfTransactions(ref);
         if (list.isEmpty()) return 0;
         int val = 0;
         for (int i = 0; i < Math.min(list.size(), 3); i++) {
@@ -69,8 +72,7 @@ public class AntiFraudServiceImpl implements AntiFraudService {
     }
 
     private int validateSpamHuman(AFRequest request, String ref) {
-        var list = afRepository.findAllBySrcAccountNumberOrderByTransactionDateDesc(ref);
-        if (list.isEmpty()) list = afRepository.findAllBySenderIdOrderByTransactionDateDesc(ref);
+        List<AFTransaction> list = getAfTransactions(ref);
         int val = 0;
         for (int i = 0; i < Math.min(list.size(), 3); i++) {
             if (list.get(i).compareSimilarity(request) > 80) val++;
@@ -80,11 +82,20 @@ public class AntiFraudServiceImpl implements AntiFraudService {
     }
 
     private int validateSpamBot(AFRequest request, String ref) {
-        var list = afRepository.findAllBySrcAccountNumberOrderByTransactionDateDesc(ref);
-        if (list.isEmpty()) list = afRepository.findAllBySenderIdOrderByTransactionDateDesc(ref);
+        List<AFTransaction> list = getAfTransactions(ref);
         if (!list.isEmpty() && !(list.get(0).getTransactionDate().plus(1, ChronoUnit.SECONDS).isBefore(Instant.now())))
             return 3;
         return 0;
+    }
+
+    private List<AFTransaction> getAfTransactions(String ref) {
+        List<AFTransaction> list = afRepository.findAllBySrcAccountNumberOrderByTransactionDateDesc(ref);
+        list.addAll(afRepository.findAllBySenderIdOrderByTransactionDateDesc(ref));
+        list.sort((o1, o2) -> {
+            if (o1.getTransactionDate().isBefore(o2.getTransactionDate())) return -1;
+            return o1.getTransactionDate().isAfter(o2.getTransactionDate()) ? 1 : 0;
+        });
+        return list;
     }
 
     private int validateLegalRequirements(AFRequest request) {
