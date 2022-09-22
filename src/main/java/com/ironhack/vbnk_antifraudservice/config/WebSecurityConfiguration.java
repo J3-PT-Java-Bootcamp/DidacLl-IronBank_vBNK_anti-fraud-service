@@ -36,6 +36,7 @@ public class WebSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapt
                 .authorizeRequests()
                 .antMatchers("/v1/af/client/**").permitAll()
                 .antMatchers("/v1/af/**").hasRole("developer")
+                .antMatchers("/docs/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

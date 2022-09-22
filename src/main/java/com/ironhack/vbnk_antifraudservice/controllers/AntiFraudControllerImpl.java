@@ -3,6 +3,7 @@ package com.ironhack.vbnk_antifraudservice.controllers;
 import com.ironhack.vbnk_antifraudservice.model.AFRequest;
 import com.ironhack.vbnk_antifraudservice.model.AFResponse;
 import com.ironhack.vbnk_antifraudservice.services.AntiFraudService;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,10 +12,13 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping("/v1/af")
 public class AntiFraudControllerImpl implements AntiFraudController {
-    @Autowired
-    AntiFraudService service;
-    @Override
-    @PatchMapping("/client/validate")
+    final AntiFraudService service;
+
+    public AntiFraudControllerImpl(AntiFraudService service) {
+        this.service = service;
+    }
+
+    @Override @PatchMapping("/client/validate")
     public AFResponse validateTransaction(@RequestBody AFRequest request) {
         if((request.getAmount()==null||request.getAmount().compareTo(BigDecimal.ZERO)<=0)||
                 ((request.getSenderId()==null|| request.getSenderId().equalsIgnoreCase("")))&&
@@ -27,16 +31,14 @@ public class AntiFraudControllerImpl implements AntiFraudController {
 
         return service.registerTransaction(request,res);
     }
-
-    @Override
+    @Hidden @Override
     @GetMapping("/client/test/{ping}")
     public String ping(@PathVariable(name = "ping") String ping) {
         return ping.replace('i','o');
     }
 
-    @Override
-    @GetMapping("/v1/af/service/update")
-    public void updateService(){
-        // TODO: 18/09/2022 check >48h Transactions and make a log
+    @Override @GetMapping("/v1/af/service/update")
+    public void updateAFLog(){
+
     }
 }
