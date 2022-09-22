@@ -16,7 +16,4 @@ public interface AntiFraudService {
 //    List<AFTransactionDTO> getLast24HoursUserTransactions
 
 
-
-
-
 }

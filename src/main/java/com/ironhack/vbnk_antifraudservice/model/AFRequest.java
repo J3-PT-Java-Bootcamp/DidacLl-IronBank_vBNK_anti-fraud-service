@@ -13,5 +13,5 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class AFRequest {
     private BigDecimal amount;
-    private String srcAccountNumber,senderId;
+    private String srcAccountNumber, senderId;
 }

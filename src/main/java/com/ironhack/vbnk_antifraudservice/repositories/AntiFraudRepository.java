@@ -8,14 +8,13 @@ import java.time.Instant;
 import java.util.List;
 
 @Repository
-public interface AntiFraudRepository extends JpaRepository<AFTransaction,String> {
+public interface AntiFraudRepository extends JpaRepository<AFTransaction, String> {
 
-List<AFTransaction> findAllBySrcAccountNumberOrderByTransactionDateDesc(String accountId);
-List<AFTransaction> findAllBySenderIdOrderByTransactionDateDesc(String accountId);
+    List<AFTransaction> findAllBySrcAccountNumberOrderByTransactionDateDesc(String accountId);
 
-List<AFTransaction> findAllByTransactionDateBefore(Instant date);
+    List<AFTransaction> findAllBySenderIdOrderByTransactionDateDesc(String accountId);
 
-
+    List<AFTransaction> findAllByTransactionDateBefore(Instant date);
 
 
 }

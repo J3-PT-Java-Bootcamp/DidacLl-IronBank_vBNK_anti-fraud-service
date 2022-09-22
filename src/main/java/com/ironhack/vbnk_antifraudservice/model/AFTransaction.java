@@ -11,23 +11,25 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 public class AFTransaction {
     @Id
-    @GeneratedValue(generator = "uuid2") @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column( updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
     private String id;
     private BigDecimal amount;
-    private String srcAccountNumber,senderId;
+    private String srcAccountNumber, senderId;
     @Embedded
     private AFResponse result;
     @CreationTimestamp
     @Column(updatable = false)
     private Instant transactionDate;
 
-    public static AFTransaction fromDTO(AFTransactionDTO dto){
+    public static AFTransaction fromDTO(AFTransactionDTO dto) {
         return new AFTransaction()
                 .setTransactionDate(dto.getTransactionDate())
                 .setAmount(dto.getAmount())
@@ -37,18 +39,18 @@ public class AFTransaction {
 
     public int compareSimilarity(AFRequest request) {
         int val = 0;
-        if(this.amount==request.getAmount())val++;
-        if (this.srcAccountNumber==request.getSrcAccountNumber())val++;
-        if(this.senderId== request.getSenderId())val++;
-        if (this.transactionDate.plus(6, ChronoUnit.HOURS).isAfter(Instant.now()))val+=2;
-        else if(this.transactionDate.plus(1, ChronoUnit.DAYS).isAfter(Instant.now()))val++;
-        return (int)(val/5F*100);
+        if (this.amount.equals(request.getAmount())) val++;
+        if (this.srcAccountNumber.equals(request.getSrcAccountNumber())) val++;
+        if (this.senderId.equals(request.getSenderId())) val++;
+        if (this.transactionDate.plus(6, ChronoUnit.HOURS).isAfter(Instant.now())) val += 2;
+        else if (this.transactionDate.plus(1, ChronoUnit.DAYS).isAfter(Instant.now())) val++;
+        return (int) (val / 5F * 100);
     }
 
     public boolean compare(AFRequest request) {
-        return this.amount==request.getAmount()
-                && this.srcAccountNumber==request.getSrcAccountNumber()
-                && this.senderId== request.getSenderId()
+        return this.amount.equals(request.getAmount())
+                && this.srcAccountNumber.equals(request.getSrcAccountNumber())
+                && this.senderId.equals(request.getSenderId())
                 && this.transactionDate.plus(1, ChronoUnit.HOURS).isAfter(Instant.now());
 
     }

@@ -10,7 +10,7 @@ class AFTransactionTest {
 
     @Test
     void compare_test() {
-        var aft= new AFTransaction()
+        var aft = new AFTransaction()
                 .setTransactionDate(Instant.now().minus(5, ChronoUnit.HOURS))
                 .setAmount(BigDecimal.TEN)
                 .setSenderId("patata")
