@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 class AFTransactionTest {
 
     @Test
@@ -21,6 +23,6 @@ class AFTransactionTest {
                 .setSenderId("patata")
                 .setSrcAccountNumber("frita");
 
-        System.out.println(aft.compareSimilarity(aft2));
+        assertTrue(aft.compareSimilarity(aft2)>50);
     }
 }
